@@ -1,12 +1,14 @@
 using CoreApiTest.Data;
-using CoreApiTest.Interface;
-using CoreApiTest.Service;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using CoreApiTest.Exceptions;
 using CoreApiTest.Helpers;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using Newtonsoft.Json;
+using CoreApiTest.Interface;
 using CoreApiTest.Resource.Helpers;
+using CoreApiTest.Service;
+using Hangfire;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
+using System.Text;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
@@ -14,16 +16,19 @@ var configuration = builder.Configuration;
 
 // Add services to the container.
 
-builder.Services.AddControllers();
-builder.Services.AddControllers().AddNewtonsoftJson(options =>
-    options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-);
+builder.Services.AddControllers(
+    options =>
+    {
+        options.Filters.Add(typeof(ExceptionFilter));
+    }
+).AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
 
 //builder.Services.AddDbContext<CoreApiTestContext>(
 //        options => options.UseSqlServer(configuration["ConnectionStrings:default"]));
 builder.Services.AddDbContext<CoreApiTestContext>();
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
+//builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddAutoMapper(typeof(Program));
+//builder.Services.AddHostedService<TimerService>();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -58,6 +63,25 @@ builder.Services.AddCors(options =>
                       });
 });
 
+//Hangfire Service
+/*
+string dbConnectionString = configuration["ConnectionStrings:default"];
+builder.Services.AddHangfire(configuration => configuration
+.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+.UseSimpleAssemblyNameTypeSerializer()
+.UseRecommendedSerializerSettings()
+.UseSqlServerStorage(dbConnectionString, new SqlServerStorageOptions
+{
+    CommandBatchMaxTimeout = TimeSpan.FromSeconds(5),
+    SlidingInvisibilityTimeout = TimeSpan.FromSeconds(5),
+    QueuePollInterval = TimeSpan.Zero,
+    UseRecommendedIsolationLevel = true,
+    DisableGlobalLocks = true
+}));
+*/
+builder.Services.AddHangfire(x => x.UseSqlServerStorage(configuration["ConnectionStrings:default"]));
+builder.Services.AddHangfireServer();
+
 // µù¥UªA°È
 builder.Services.AddSingleton<JwtHelpers>();
 
@@ -69,6 +93,7 @@ builder.Services.AddTransient<ToUserApiResource>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseHangfireDashboard();
 app.UseCors(MyAllowSpecificOrigins);
 app.UseAuthentication();
 app.UseAuthorization();

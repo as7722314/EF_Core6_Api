@@ -4,12 +4,14 @@ using CoreApiTest.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using System.Data.Common;
 
 namespace CoreApiTest.Service
 {
     public class UserService : IUserService
     {
         private readonly CoreApiTestContext _coreApiTestContext;
+
         public UserService(CoreApiTestContext coreApiTestContext)
         {
             _coreApiTestContext = coreApiTestContext;
@@ -30,7 +32,7 @@ namespace CoreApiTest.Service
             catch (Exception)
             {
                 transation.Rollback();
-                throw ;
+                throw;
             }
         }
 
@@ -43,14 +45,14 @@ namespace CoreApiTest.Service
             }
             catch (Exception)
             {
-                throw ;
+                throw;
             }
         }
 
         public async Task<List<User>> GetAllUsers()
         {
             var users = await _coreApiTestContext.Users.OrderByDescending(u => u.Id).ToArrayAsync();
-            return users.ToList() ;
+            return users.ToList();
         }
 
         public async Task<User?> GetUserById(int id)

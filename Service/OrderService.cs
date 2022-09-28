@@ -6,6 +6,7 @@ using CoreApiTest.Resource.Helpers;
 using Microsoft.Data.SqlClient;
 using static NuGet.Packaging.PackagingConstants;
 using System.Security.Cryptography.X509Certificates;
+using System.Data.Common;
 
 namespace CoreApiTest.Service
 {
@@ -17,6 +18,7 @@ namespace CoreApiTest.Service
         {
             _coreApiTestContext = coreApiTestContext;
         }
+
         public async Task<Order> CreateOrder(int userId, Order order)
         {
             var transation = _coreApiTestContext.Database.BeginTransaction();
@@ -51,12 +53,13 @@ namespace CoreApiTest.Service
         public async Task<List<Order>> GetOrders(string sortName, string sort)
         {
             List<Order> orders = new();
-            
+
             switch (sortName + "_" + sort)
             {
                 case "id_desc":
                     orders = await _coreApiTestContext.Orders.Include(o => o.User).OrderByDescending(o => o.Id).ToListAsync();
                     break;
+
                 case "id_asc":
                     orders = await _coreApiTestContext.Orders.Include(o => o.User).OrderBy(o => o.Id).ToListAsync();
                     break;
