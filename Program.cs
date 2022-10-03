@@ -1,14 +1,11 @@
 using CoreApiTest.Data;
 using CoreApiTest.Exceptions;
-using CoreApiTest.Helpers;
 using CoreApiTest.Interface;
 using CoreApiTest.Resource.Helpers;
 using CoreApiTest.Service;
-using Hangfire;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Newtonsoft.Json;
-using System.Text;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
@@ -30,6 +27,8 @@ builder.Services.AddDbContext<CoreApiTestContext>();
 builder.Services.AddAutoMapper(typeof(Program));
 //builder.Services.AddHostedService<TimerService>();
 
+//JWT
+/*
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -51,6 +50,42 @@ builder.Services.AddAuthentication(options =>
         RequireExpirationTime = true,
     };
 });
+*/
+
+//Google Auth
+/*
+builder.Services
+    .AddAuthentication(options =>
+        {
+            options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+        })
+    .AddCookie()
+    .AddGoogle(googleOptions =>
+        {
+            googleOptions.ClientId = configuration["Google:ClientId"];
+            googleOptions.ClientSecret = configuration["Google:ClientSecret"];
+            googleOptions.SaveTokens = true;
+        });
+*/
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+})
+    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
+    {
+        options.Authority = configuration["Google:Authority"];
+        options.ClientId = configuration["Google:ClientId"];
+        options.ClientSecret = configuration["Google:ClientSecret"];
+        options.ResponseType = "code";
+
+        options.Scope.Add("openid");
+        options.Scope.Add("profile");
+
+        options.SaveTokens = true;
+    });
 
 builder.Services.AddCors(options =>
 {
@@ -79,11 +114,11 @@ builder.Services.AddHangfire(configuration => configuration
     DisableGlobalLocks = true
 }));
 */
-builder.Services.AddHangfire(x => x.UseSqlServerStorage(configuration["ConnectionStrings:default"]));
-builder.Services.AddHangfireServer();
+//builder.Services.AddHangfire(x => x.UseSqlServerStorage(configuration["ConnectionStrings:default"]));
+//builder.Services.AddHangfireServer();
 
 // µù¥UªA°È
-builder.Services.AddSingleton<JwtHelpers>();
+//builder.Services.AddSingleton<JwtHelpers>();
 
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IOrderService, OrderService>();
@@ -93,9 +128,16 @@ builder.Services.AddTransient<ToUserApiResource>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-app.UseHangfireDashboard();
+
+//app.UseHangfireDashboard();
+
 app.UseCors(MyAllowSpecificOrigins);
+
+app.UseHttpsRedirection();
+
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
+
 app.Run();

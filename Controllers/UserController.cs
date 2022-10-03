@@ -1,18 +1,20 @@
-﻿using CoreApiTest.Models;
+﻿using CoreApiTest.Interface;
+using CoreApiTest.Models;
 using CoreApiTest.Resource.Helpers;
-using CoreApiTest.Interface;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace CoreApiTest.Controllers
 {
     [Route("api/user/")]
-    [ApiController]    
+    [ApiController]
     public class UserController : ControllerBase
     {
         // GET: api/<UsersController>
         private readonly IUserService _userService;
+
         private readonly ToUserApiResource _toUserApiResource;
 
         public UserController(IUserService userService, ToUserApiResource toUserApiResource)
@@ -21,18 +23,17 @@ namespace CoreApiTest.Controllers
             _toUserApiResource = toUserApiResource;
         }
 
+        [Authorize]
         [HttpGet]
-        //[Authorize]
-        //[Authorize(Roles = "admin")]
         public async Task<IActionResult> Get()
         {
             var users = await _userService.GetAllUsers();
-            return Ok(new { data = _toUserApiResource.DoConvertForList(users) });
+            return Ok(new { data = User.Claims.ToList() });
         }
 
         // GET api/<UsersController>/5
         [HttpGet("{id}")]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> Get(int id)
         {
             var user = await _userService.GetUserById(id);
@@ -57,7 +58,7 @@ namespace CoreApiTest.Controllers
             var o_user = await _userService.GetUserById(id);
             if (o_user is null) return NoContent();
             var new_user = await _userService.UpdateUser(o_user, users);
-            return Ok(new_user);            
+            return Ok(new_user);
         }
 
         // DELETE api/<UsersController>/5

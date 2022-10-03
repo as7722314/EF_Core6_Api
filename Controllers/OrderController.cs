@@ -1,22 +1,24 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using CoreApiTest.Models;
+﻿using AutoMapper;
 using CoreApiTest.Interface;
-using Microsoft.AspNetCore.Authorization;
-using CoreApiTest.Resource.Helpers;
-using System.Security.Claims;
-using AutoMapper;
+using CoreApiTest.Models;
 using CoreApiTest.Resource;
+using CoreApiTest.Resource.Helpers;
+using Hangfire;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace CoreApiTest.Controllers
 {
-    [Route("api/order/")]
+    [Route("api/order")]
     [ApiController]
     public class OrderController : ControllerBase
     {
+        public readonly IMapper _mapper;
         private readonly IOrderService _orderService;
         private readonly ToOrderApiResource _toOrderApiResource;
-        public readonly IMapper _mapper;
 
         public OrderController(IOrderService orderService, ToOrderApiResource toOrderApiResource, IMapper mapper)
         {
@@ -24,9 +26,9 @@ namespace CoreApiTest.Controllers
             _toOrderApiResource = toOrderApiResource;
             _mapper = mapper;
         }
+
         // GET: api/<OrderController>
         [HttpGet]
-        //[Authorize]
         public async Task<IActionResult> GetAllOrders([FromQuery] string sortName, string sort)
         {
             var orders = await _orderService.GetOrders(sortName, sort);
@@ -36,7 +38,6 @@ namespace CoreApiTest.Controllers
 
         // GET api/<OrderController>/5
         [HttpGet("{id}")]
-        //[Authorize]
         public async Task<IActionResult> GetOrderById(int id)
         {
             var order = await _orderService.GetOrderById(id);

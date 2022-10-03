@@ -2,11 +2,6 @@
 using CoreApiTest.Interface;
 using CoreApiTest.Models;
 using Microsoft.EntityFrameworkCore;
-using CoreApiTest.Resource.Helpers;
-using Microsoft.Data.SqlClient;
-using static NuGet.Packaging.PackagingConstants;
-using System.Security.Cryptography.X509Certificates;
-using System.Data.Common;
 
 namespace CoreApiTest.Service
 {

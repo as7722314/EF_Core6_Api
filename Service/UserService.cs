@@ -1,10 +1,7 @@
-﻿using CoreApiTest.Interface;
+﻿using CoreApiTest.Data;
+using CoreApiTest.Interface;
 using CoreApiTest.Models;
-using CoreApiTest.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Mvc;
-using System.Net;
-using System.Data.Common;
 
 namespace CoreApiTest.Service
 {

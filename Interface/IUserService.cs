@@ -1,5 +1,4 @@
 ﻿using CoreApiTest.Models;
-using Microsoft.AspNetCore.Mvc;
 
 namespace CoreApiTest.Interface
 {

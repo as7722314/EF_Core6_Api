@@ -1,8 +1,5 @@
 ﻿using CoreApiTest.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
-using System.Reflection.Emit;
-using System.Reflection.Metadata;
 
 namespace CoreApiTest.Data
 {
@@ -18,7 +15,8 @@ namespace CoreApiTest.Data
             _configuration = configuration;
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder options) {
+        protected override void OnConfiguring(DbContextOptionsBuilder options)
+        {
             options.UseSqlServer(_configuration["ConnectionStrings:default"]);
         }
 
@@ -26,16 +24,16 @@ namespace CoreApiTest.Data
         public DbSet<Order> Orders { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-            {
-                modelBuilder.Entity<Order>()
-                    .HasOne(o => o.User)
-                    .WithMany(u => u.Orders);
-                modelBuilder.Entity<Order>()
-                     .Property(s => s.CreatedAt)
-                     .HasDefaultValueSql("GETDATE()");
-                modelBuilder.Entity<User>()
-                     .Property(s => s.CreatedAt)
-                     .HasDefaultValueSql("GETDATE()");
+        {
+            modelBuilder.Entity<Order>()
+                .HasOne(o => o.User)
+                .WithMany(u => u.Orders);
+            modelBuilder.Entity<Order>()
+                 .Property(s => s.CreatedAt)
+                 .HasDefaultValueSql("GETDATE()");
+            modelBuilder.Entity<User>()
+                 .Property(s => s.CreatedAt)
+                 .HasDefaultValueSql("GETDATE()");
         }
     }
 }

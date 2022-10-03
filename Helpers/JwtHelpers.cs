@@ -1,8 +1,8 @@
-﻿using System.Security.Claims;
-using System.Text;
-using System.IdentityModel.Tokens.Jwt;
+﻿using CoreApiTest.Models;
 using Microsoft.IdentityModel.Tokens;
-using CoreApiTest.Models;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace CoreApiTest.Helpers
 {

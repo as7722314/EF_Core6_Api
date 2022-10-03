@@ -1,21 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using CoreApiTest.Helpers;
 using CoreApiTest.Interface;
-using CoreApiTest.Helpers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CoreApiTest.Controllers
 {
-    [Route("api/auth/")]
+    [Route("api/auth")]
     [ApiController]
     public class LoginController : ControllerBase
     {
         private readonly IUserService _userService;
         private readonly JwtHelpers _jwtHelpers;
-        public class LoginModel
-        {
-            public string Account { get; set; } = null!;
-            public string Password { get; set; } = null!;
-        }
 
         public LoginController(IUserService userService, JwtHelpers jwtHelpers)
         {
@@ -29,14 +24,14 @@ namespace CoreApiTest.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _userService.GetUserOnLogin(loginModel.Account);
-                if(user == null)
+                if (user == null)
                 {
                     return BadRequest(new
                     {
                         message = $"找不到使用者{loginModel.Account}"
                     });
                 }
-                if(user.Password == loginModel.Password)
+                if (user.Password == loginModel.Password)
                 {
                     var token = _jwtHelpers.GenerateToken(user, "admin");
                     return Ok(new
@@ -53,11 +48,12 @@ namespace CoreApiTest.Controllers
                 message = "帳號或密碼錯誤"
             });
         }
+
         [HttpGet("user")]
         [Authorize]
         public async Task<IActionResult> AuthUser()
         {
-            if(User.Identity?.Name is not null)
+            if (User.Identity?.Name is not null)
             {
                 int id = Int32.Parse(User.Identity.Name);
                 var user = await _userService.GetUserById(id);
@@ -87,6 +83,12 @@ namespace CoreApiTest.Controllers
                 }
             }
             return NotFound();
+        }
+
+        public class LoginModel
+        {
+            public string Account { get; set; } = null!;
+            public string Password { get; set; } = null!;
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using CoreApiTest.Models;
-using static NuGet.Packaging.PackagingConstants;
 
 namespace CoreApiTest.Resource.Helpers
 {
