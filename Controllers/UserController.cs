@@ -23,7 +23,7 @@ namespace CoreApiTest.Controllers
             _toUserApiResource = toUserApiResource;
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpGet]
         public async Task<IActionResult> Get()
         {

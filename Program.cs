@@ -1,11 +1,14 @@
 using CoreApiTest.Data;
 using CoreApiTest.Exceptions;
 using CoreApiTest.Interface;
+using CoreApiTest.Middleware;
+using CoreApiTest.Models;
 using CoreApiTest.Resource.Helpers;
 using CoreApiTest.Service;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using System.Configuration;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
@@ -26,6 +29,8 @@ builder.Services.AddDbContext<CoreApiTestContext>();
 //builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddAutoMapper(typeof(Program));
 //builder.Services.AddHostedService<TimerService>();
+builder.Services.AddHttpClient();
+builder.Services.AddSwaggerGen();
 
 //JWT
 /*
@@ -53,21 +58,25 @@ builder.Services.AddAuthentication(options =>
 */
 
 //Google Auth
-/*
+
 builder.Services
     .AddAuthentication(options =>
         {
             options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+            //options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
         })
-    .AddCookie()
-    .AddGoogle(googleOptions =>
-        {
-            googleOptions.ClientId = configuration["Google:ClientId"];
-            googleOptions.ClientSecret = configuration["Google:ClientSecret"];
-            googleOptions.SaveTokens = true;
-        });
+    .AddCookie();
+/*
+.AddGoogle(
+googleOptions =>
+    {
+        googleOptions.ClientId = configuration["Google:ClientId"];
+        googleOptions.ClientSecret = configuration["Google:ClientSecret"];
+        googleOptions.CallbackPath = "/auth/success";
+    });
 */
+
+/*
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -86,6 +95,7 @@ builder.Services.AddAuthentication(options =>
 
         options.SaveTokens = true;
     });
+*/
 
 builder.Services.AddCors(options =>
 {
@@ -131,11 +141,20 @@ var app = builder.Build();
 
 //app.UseHangfireDashboard();
 
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
 app.UseCors(MyAllowSpecificOrigins);
 
 app.UseHttpsRedirection();
 
+app.UseTestMiddleware();
+
 app.UseAuthentication();
+
 app.UseAuthorization();
 
 app.MapControllers();

@@ -3,7 +3,6 @@ using CoreApiTest.Interface;
 using CoreApiTest.Models;
 using CoreApiTest.Resource;
 using CoreApiTest.Resource.Helpers;
-using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -57,18 +56,6 @@ namespace CoreApiTest.Controllers
                 return Ok(new { data = _toOrderApiResource.DoConvertForModel(new_order) });
             }
             return BadRequest();
-        }
-
-        // PUT api/<OrderController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/<OrderController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
         }
     }
 }

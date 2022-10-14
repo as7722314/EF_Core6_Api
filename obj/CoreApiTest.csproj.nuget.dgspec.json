@@ -97,9 +97,17 @@
               "target": "Package",
               "version": "[6.23.1, )"
             },
+            "Microsoft.Owin.Security.Google": {
+              "target": "Package",
+              "version": "[4.2.2, )"
+            },
             "Microsoft.VisualStudio.Web.CodeGeneration.Design": {
               "target": "Package",
-              "version": "[6.0.8, )"
+              "version": "[6.0.10, )"
+            },
+            "Swashbuckle.AspNetCore": {
+              "target": "Package",
+              "version": "[6.4.0, )"
             }
           },
           "imports": [

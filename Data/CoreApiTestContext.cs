@@ -15,13 +15,14 @@ namespace CoreApiTest.Data
             _configuration = configuration;
         }
 
+        public DbSet<User> Users { get; set; } = null!;
+
+        public DbSet<Order> Orders { get; set; } = null!;
+
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
             options.UseSqlServer(_configuration["ConnectionStrings:default"]);
         }
-
-        public DbSet<User> Users { get; set; } = null!;
-        public DbSet<Order> Orders { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
